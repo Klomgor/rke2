@@ -1,7 +1,12 @@
 ---
 collections:
   - name: ansible.utils
+    version: latest
   - name: community.general
+    version: latest
   - name: ansible.posix
+    version: latest
   - name: kubernetes.core
+    version: latest
   - name: ansible.windows
+    version: latest
