@@ -34,3 +34,45 @@
   become: true
   roles:
     - monitoring
+
+- name: Install RKE2 Cluster
+  hosts: admin
+  gather_facts: true
+  roles:
+    - ssh
+
+- name: Download RKE2
+  hosts: servers,agents,longhorn
+  gather_facts: true
+  roles:
+    - rke2-download
+
+- name: Deploy Kube VIP
+  hosts: servers
+  gather_facts: true
+  roles:
+    - kube-vip
+
+- name: Prepare RKE2 on Servers and Agents
+  hosts: servers,agents,longhorn
+  gather_facts: true
+  roles:
+    - rke2-prepare
+
+- name: Add additional RKE2 Servers and Agents
+  hosts: servers,agents,longhorn
+  gather_facts: true
+  roles:
+    - rke2
+
+- name: Apply manifests and security configurations
+  hosts: servers
+  gather_facts: true
+  roles:
+    - kubernetes
+
+- name: Install Helm repositories and deploy charts
+  hosts: admin
+  gather_facts: true
+  roles:
+    - helm

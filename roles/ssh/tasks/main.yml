@@ -1,0 +1,69 @@
+---
+- name: Ensure .ssh directory exists on admin node
+  ansible.builtin.file:
+    path: "/home/{{ ansible_user }}/.ssh"
+    state: directory
+    mode: '0700'
+
+- name: Copy id_rsa to admin node
+  ansible.builtin.copy:
+    src: "/Users/ok/.ssh/id_rsa"
+    dest: "/home/{{ ansible_user }}/.ssh/id_rsa"
+    mode: '0600'
+
+- name: Copy id_rsa.pub to admin node
+  ansible.builtin.copy:
+    src: "/Users/ok/.ssh/id_rsa.pub"
+    dest: "/home/{{ ansible_user }}/.ssh/id_rsa.pub"
+    mode: '0644'
+
+- name: Add the private key to the SSH agent
+  ansible.builtin.shell: |
+    eval "$(ssh-agent -s)"
+    ssh-add /home/{{ ansible_user }}/.ssh/id_rsa
+  args:
+    executable: /bin/bash
+  creates: /home/{{ ansible_user }}/.ssh/id_rsa
+
+- name: Ensure SSH config exists
+  ansible.builtin.file:
+    path: "/home/{{ ansible_user }}/.ssh/config"
+    state: touch
+    mode: '0600'
+  check_mode: false
+
+- name: Set StrictHostKeyChecking to no in SSH config
+  ansible.builtin.lineinfile:
+    path: "/home/{{ ansible_user }}/.ssh/config"
+    line: "StrictHostKeyChecking no"
+    insertafter: BOF
+
+- name: Check if kubectl is installed
+  ansible.builtin.command: which kubectl
+  ignore_errors: true
+  register: kubectl_installed
+  changed_when: false
+
+- name: Download kubectl
+  ansible.builtin.get_url:
+    url: "https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl"
+    dest: "/usr/local/bin/kubectl"
+    mode: '0755'
+  when: kubectl_installed.rc != 0
+
+- name: Ensure .ssh directory exists on all nodes
+  ansible.builtin.file:
+    path: "/home/{{ ansible_user }}/.ssh"
+    state: directory
+    mode: '0700'
+  when: inventory_hostname != 'rke2-00'
+
+- name: Copy id_rsa.pub to all nodes
+  ansible.builtin.copy:
+    src: "/home/{{ ansible_user }}/.ssh/id_rsa.pub"
+    dest: "/home/{{ ansible_user }}/.ssh/authorized_keys"
+    mode: '0644'
+    remote_src: true
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  when: inventory_hostname != 'rke2-00'

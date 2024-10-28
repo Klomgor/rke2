@@ -1,0 +1,24 @@
+---
+- name: Manage Kubernetes resources and configurations
+  hosts: all
+  tasks:
+    - name: Apply Kubernetes manifests
+      kubernetes.core.k8s:
+        kubeconfig: /etc/rancher/rke2/rke2.yaml
+        state: present
+        definition: "{{ lookup('template', 'kubernetes-manifests.yaml.j2') | from_yaml_all | list }}"
+      when: inventory_hostname in groups['servers']
+
+    - name: Deploy network policies
+      kubernetes.core.k8s:
+        kubeconfig: /etc/rancher/rke2/rke2.yaml
+        state: present
+        definition: "{{ lookup('template', 'network-policies.yaml.j2') | from_yaml_all | list }}"
+      when: inventory_hostname in groups['servers']
+
+    - name: Deploy security configurations
+      kubernetes.core.k8s:
+        kubeconfig: /etc/rancher/rke2/rke2.yaml
+        state: present
+        definition: "{{ lookup('template', 'security-configurations.yaml.j2') | from_yaml_all | list }}"
+      when: inventory_hostname in groups['servers']
