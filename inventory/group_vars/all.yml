@@ -17,7 +17,7 @@ longhorn_default_storage_class: true
 
 # Monitoring configuration
 prometheus_retention: 15d
-grafana_admin_password: "changeme"
+grafana_admin_password: "{{ vault_grafana_admin_password }}"
 
 # Security configuration
 enable_pod_security_policies: true
@@ -38,7 +38,7 @@ vault_ha_enabled: true
 vault_storage_size: "10Gi"
 
 # ArgoCD configuration
-argocd_admin_password: "changeme"
+argocd_admin_password: "{{ vault_argocd_admin_password }}"
 
 # Istio configuration
 istio_profile: "default"  # or "demo" for testing
