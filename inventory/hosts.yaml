@@ -1,0 +1,18 @@
+all:
+  children:
+    servers:
+      hosts:
+        server1:
+        server2:
+    agents:
+      hosts:
+        agent1:
+        agent2:
+    longhorn:
+      hosts:
+        longhorn1:
+        longhorn2:
+    admin:
+      hosts:
+        admin1:
+        admin2

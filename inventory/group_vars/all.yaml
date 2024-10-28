@@ -1,0 +1,22 @@
+# Define variables for versions of kubectl, helm, rancher_cli, and metallb
+kubectl_version: "v1.21.0"
+helm_version: "v3.6.3"
+rancher_cli_version: "v2.6.9"
+metallb_version: "v0.12.1"
+
+# Define variables for Helm repository URLs
+helm_repos:
+  - name: jetstack
+    url: https://charts.jetstack.io
+  - name: metallb
+    url: https://metallb.github.io/metallb
+  - name: longhorn
+    url: https://charts.longhorn.io
+  - name: argo
+    url: https://argoproj.github.io/argo-helm
+  - name: hashicorp
+    url: https://helm.releases.hashicorp.com
+  - name: vmware-tanzu
+    url: https://vmware-tanzu.github.io/helm-charts
+  - name: istio
+    url: https://istio-release.storage.googleapis.com/charts

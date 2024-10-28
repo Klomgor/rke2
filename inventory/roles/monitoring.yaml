@@ -4,14 +4,12 @@
     name: prometheus-community
     repo_url: https://prometheus-community.github.io/helm-charts
     kubeconfig: /etc/rancher/rke2/rke2.yaml
-  # Add Prometheus community Helm repository
 
 - name: Add Grafana Helm repo
   kubernetes.core.helm_repository:
     name: grafana
     repo_url: https://grafana.github.io/helm-charts
     kubeconfig: /etc/rancher/rke2/rke2.yaml
-  # Add Grafana Helm repository
 
 - name: Create monitoring namespace
   kubernetes.core.k8s:
@@ -22,7 +20,6 @@
       kind: Namespace
       metadata:
         name: monitoring
-  # Create monitoring namespace
 
 - name: Deploy kube-prometheus-stack
   kubernetes.core.helm:
@@ -32,7 +29,6 @@
     kubeconfig: /etc/rancher/rke2/rke2.yaml
     values: "{{ lookup('template', 'prometheus-values.yaml.j2') | from_yaml }}"
     wait: yes
-  # Deploy kube-prometheus-stack
 
 - name: Deploy Loki stack
   kubernetes.core.helm:
@@ -42,4 +38,3 @@
     kubeconfig: /etc/rancher/rke2/rke2.yaml
     values: "{{ lookup('template', 'loki-values.yaml.j2') | from_yaml }}"
     wait: yes
-  # Deploy Loki stack
