@@ -1,0 +1,59 @@
+---
+- name: Install RKE2 Cluster
+  hosts: admin
+  gather_facts: true
+  roles:
+    - prepare-admin
+    - prepare-nodes
+
+- name: Download RKE2
+  hosts: servers,agents,longhorn
+  gather_facts: true
+  roles:
+    - rke2-download
+
+- name: Deploy Kube VIP
+  hosts: servers
+  gather_facts: true
+  roles:
+    - kube-vip
+
+- name: Prepare RKE2 on Servers and Agents
+  hosts: servers,agents,longhorn
+  gather_facts: true
+  roles:
+    - rke2-prepare
+
+- name: Add additional RKE2 Servers
+  hosts: servers
+  gather_facts: true
+  roles:
+    - add-server
+
+- name: Add additional RKE2 Agents
+  hosts: agents,longhorn
+  gather_facts: true
+  roles:
+    - add-agent
+
+- name: Apply manifests after cluster is created
+  hosts: servers
+  gather_facts: true
+  roles:
+    - apply-manifests
+
+- name: Install rancher
+  hosts: admin
+  gather_facts: true
+  roles:
+    - install-rancher
+
+- name: Install Longhorn
+  hosts: servers
+  gather_facts: true
+  roles:
+    - install-longhorn
+
+# - name: Install kubewarden
+
+# - name: Install neuvector

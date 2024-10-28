@@ -1,0 +1,24 @@
+loki:
+  persistence:
+    enabled: true
+    size: 50Gi
+  config:
+    auth_enabled: false
+    ingester:
+      chunk_idle_period: 3m
+      chunk_block_size: 262144
+      chunk_retain_period: 1m
+      max_transfer_retries: 0
+      lifecycler:
+        ring:
+          kvstore:
+            store: inmemory
+          replication_factor: 1
+
+promtail:
+  enabled: true
+  config:
+    lokiAddress: http://{{ .Release.Name }}-loki:3100/loki/api/v1/push
+
+grafana:
+  enabled: false  # We're using the Grafana from kube-prometheus-stack

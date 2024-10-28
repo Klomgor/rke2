@@ -1,0 +1,21 @@
+server:
+  ha:
+    enabled: true
+    replicas: 3
+  
+  dataStorage:
+    enabled: true
+    size: 10Gi
+    storageClass: longhorn
+    
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    hosts:
+      - host: vault.{{ cluster_domain }}
+        paths:
+          - /
+
+ui:
+  enabled: true
+  serviceType: ClusterIP

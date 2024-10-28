@@ -1,0 +1,34 @@
+---
+- name: Install open-iscsi
+  ansible.builtin.package:
+    name: open-iscsi
+    state: present
+  become: true
+  tags:
+    - install
+
+- name: Copy longhorn configs to server 1
+  ansible.builtin.template:
+    src: templates/longhorn.yaml.j2
+    dest: /home/{{ ansible_user }}/longhorn.yaml
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'
+  when: inventory_hostname == groups['servers'][0]
+  tags:
+    - configure
+
+- name: Apply longhorn configs
+  ansible.builtin.shell: |
+    kubectl apply -f /home/{{ ansible_user }}/longhorn.yaml
+  args:
+    executable: /bin/bash
+  become_user: "{{ ansible_user }}"
+  become: true
+  changed_when: "'configured' in cmd.stdout"
+  check_mode: false
+  when: inventory_hostname == groups['servers'][0]
+  tags:
+    - deploy
+  register: kubectl_apply
+  failed_when: "'error' in kubectl_apply.stderr"

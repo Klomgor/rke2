@@ -1,0 +1,24 @@
+---
+- name: Create RKE2 configuration directory
+  file:
+    path: /etc/rancher/rke2
+    state: directory
+    mode: '0755'
+
+- name: Configure RKE2 agent
+  template:
+    src: worker-config.yaml.j2
+    dest: /etc/rancher/rke2/config.yaml
+    mode: '0644'
+
+- name: Install RKE2 agent service
+  shell: |
+    curl -sfL https://get.rke2.io | INSTALL_RKE2_TYPE="agent" sh -
+  args:
+    creates: /usr/local/bin/rke2
+
+- name: Start RKE2 agent service
+  systemd:
+    name: rke2-agent
+    state: started
+    enabled: yes

@@ -1,0 +1,23 @@
+controller:
+  logLevel: info
+  resources:
+    limits:
+      cpu: 100m
+      memory: 100Mi
+    requests:
+      cpu: 50m
+      memory: 50Mi
+
+speaker:
+  logLevel: info
+  resources:
+    limits:
+      cpu: 100m
+      memory: 100Mi
+    requests:
+      cpu: 50m
+      memory: 50Mi
+
+prometheus:
+  serviceMonitor:
+    enabled: true

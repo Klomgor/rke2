@@ -1,0 +1,6 @@
+write-kubeconfig-mode: "0644"
+token: {{ hostvars['rke2-01']['token'] }}
+server: https://{{ hostvars['rke2-01']['ansible_host'] }}:9345
+node-label:
+  - "agent=true"
+  - "longhorn=true"

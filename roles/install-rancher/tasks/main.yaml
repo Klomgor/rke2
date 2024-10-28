@@ -1,0 +1,61 @@
+---
+- name: Install Helm
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+    dest: /tmp/get_helm.sh
+    mode: '0700'
+    force: false
+  changed_when: false
+
+- name: Prepare admin node for Rancher
+  ansible.builtin.shell: |
+    kubectl create namespace cattle-system
+    kubectl create namespace cert-manager
+    helm repo add jetstack https://charts.jetstack.io
+    helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
+    helm repo update
+  args:
+    chdir: /tmp
+  changed_when: false
+
+- name: Install Cert-Manager
+  ansible.builtin.shell: |
+    kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/{{ cert_manager_version }}/cert-manager.crds.yaml
+    helm install cert-manager jetstack/cert-manager \
+    --namespace cert-manager \
+    --version {{ cert_manager_version }}
+  args:
+    chdir: /tmp
+  changed_when: false
+
+- name: Install Rancher
+  ansible.builtin.shell: |
+    helm install rancher rancher-latest/rancher \
+    --namespace cattle-system \
+    --set hostname=rancher.my.org \
+    --set bootstrapPassword=admin
+    kubectl -n cattle-system rollout status deploy/rancher
+  args:
+    chdir: /tmp
+  changed_when: false
+
+- name: Add Rancher LoadBalancer
+  ansible.builtin.shell: |
+    kubectl get svc -n cattle-system
+    kubectl expose deployment rancher --name=rancher-lb --port=443 --type=LoadBalancer -n cattle-system
+  args:
+    chdir: /tmp
+  changed_when: false
+
+- name: Wait for LoadBalancer to come online
+  ansible.builtin.wait_for:
+    path: /home/{{ user }}/.kube/config
+    delay: 5
+    timeout: 1800
+    state: present
+
+- name: Get Rancher service
+  ansible.builtin.command: kubectl get svc -n cattle-system
+  environment:
+    KUBECONFIG: /home/{{ user }}/.kube/rke2.yaml
+  changed_when: false

@@ -1,0 +1,36 @@
+---
+- name: Common setup for all nodes
+  hosts: all
+  become: true
+  roles:
+    - common
+
+- name: Configure master nodes
+  hosts: master
+  become: true
+  roles:
+    - master
+
+- name: Configure worker nodes
+  hosts: worker
+  become: true
+  roles:
+    - worker
+
+- name: Configure storage nodes
+  hosts: storage
+  become: true
+  roles:
+    - storage
+
+- name: Configure admin node
+  hosts: admin
+  become: true
+  roles:
+    - admin
+
+- name: Deploy monitoring stack
+  hosts: master[0]
+  become: true
+  roles:
+    - monitoring

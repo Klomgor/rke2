@@ -1,0 +1,24 @@
+server:
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    hosts:
+      - argocd.{{ cluster_domain }}
+    tls: true
+
+  config:
+    repositories: |
+      - type: git
+        url: {{ argocd_repo_url }}
+    
+redis-ha:
+  enabled: true
+
+controller:
+  replicas: 1
+
+repoServer:
+  replicas: 2
+
+applicationSet:
+  enabled: true

@@ -1,0 +1,15 @@
+persistence:
+  defaultClass: {{ longhorn_default_storage_class }}
+  defaultClassReplicaCount: {{ longhorn_replica_count }}
+  reclaimPolicy: Retain
+
+defaultSettings:
+  defaultReplicaCount: {{ longhorn_replica_count }}
+  guaranteedEngineManagerCPU: 0.25
+  guaranteedReplicaManagerCPU: 0.25
+
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  host: longhorn.{{ cluster_domain }}
+  tls: true

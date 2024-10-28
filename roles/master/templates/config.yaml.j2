@@ -1,0 +1,15 @@
+token: {{ rke2_token }}
+tls-san:
+  - {{ kube_vip_ip }}
+{% for host in groups['master'] %}
+  - {{ hostvars[host]['ansible_host'] }}
+{% endfor %}
+cluster-cidr: {{ pod_network_cidr }}
+service-cidr: {{ service_network_cidr }}
+{% if inventory_hostname != groups['master'][0] %}
+server: https://{{ kube_vip_ip }}:9345
+{% endif %}
+node-taint:
+  - "CriticalAddonsOnly=true:NoExecute"
+disable:
+  - rke2-ingress-nginx

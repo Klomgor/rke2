@@ -1,0 +1,27 @@
+---
+- name: Configure RKE2 server
+  template:
+    src: config.yaml.j2
+    dest: /etc/rancher/rke2/config.yaml
+    mode: 0644
+
+- name: Start RKE2 server service
+  systemd:
+    name: rke2-server
+    state: started
+    enabled: yes
+
+- name: Wait for node to be ready
+  shell: |
+    /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml get nodes
+  register: node_ready
+  until: node_ready.rc == 0
+  retries: 30
+  delay: 10
+
+- name: Install kube-vip
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'kube-vip.yaml.j2') | from_yaml }}"
+    kubeconfig: /etc/rancher/rke2/rke2.yaml
+  when: inventory_hostname == groups['master'][0]
