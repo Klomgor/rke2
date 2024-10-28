@@ -7,40 +7,35 @@
       - unzip
       - bash-completion
     state: present
-  # Install required packages
 
 - name: Install kubectl
   shell: |
-    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    curl -LO "https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl"
     chmod +x kubectl
     mv kubectl /usr/local/bin/
   args:
     creates: /usr/local/bin/kubectl
-  # Install kubectl
 
 - name: Install Helm
   shell: |
     curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
   args:
     creates: /usr/local/bin/helm
-  # Install Helm
 
 - name: Install Rancher CLI
   shell: |
-    curl -LO "https://github.com/rancher/cli/releases/download/v2.6.9/rancher-linux-amd64-v2.6.9.tar.gz"
-    tar xzf rancher-linux-amd64-v2.6.9.tar.gz
-    mv rancher-v2.6.9/rancher /usr/local/bin/
-    rm -rf rancher-v2.6.9 rancher-linux-amd64-v2.6.9.tar.gz
+    curl -LO "https://github.com/rancher/cli/releases/download/{{ rancher_cli_version }}/rancher-linux-amd64-{{ rancher_cli_version }}.tar.gz"
+    tar xzf rancher-linux-amd64-{{ rancher_cli_version }}.tar.gz
+    mv rancher-{{ rancher_cli_version }}/rancher /usr/local/bin/
+    rm -rf rancher-{{ rancher_cli_version }} rancher-linux-amd64-{{ rancher_cli_version }}.tar.gz
   args:
     creates: /usr/local/bin/rancher
-  # Install Rancher CLI
 
 - name: Create .kube directory
   file:
     path: "/root/.kube"
     state: directory
     mode: '0700'
-  # Create .kube directory
 
 - name: Copy kubeconfig from first master
   ansible.builtin.fetch:
@@ -48,35 +43,30 @@
     dest: /tmp/rke2.yaml
     flat: yes
   delegate_to: "{{ groups['master'][0] }}"
-  # Copy kubeconfig from first master
 
 - name: Deploy kubeconfig to admin node
   copy:
     src: /tmp/rke2.yaml
     dest: /root/.kube/config
     mode: '0600'
-  # Deploy kubeconfig to admin node
 
 - name: Update kubeconfig server address
   replace:
     path: /root/.kube/config
     regexp: 'https://127.0.0.1:6443'
     replace: 'https://{{ kube_vip_ip }}:6443'
-  # Update kubeconfig server address
 
 - name: Set up kubectl bash completion
   lineinfile:
     path: /root/.bashrc
     line: 'source <(kubectl completion bash)'
     create: yes
-  # Set up kubectl bash completion
 
 - name: Set up helm bash completion
   lineinfile:
     path: /root/.bashrc
     line: 'source <(helm completion bash)'
     create: yes
-  # Set up helm bash completion
 
 - name: Create aliases for convenience
   blockinfile:
@@ -92,7 +82,6 @@
       alias ctx='kubectl config use-context'
       alias ns='kubectl config set-context --current --namespace'
     marker: "# {mark} ANSIBLE MANAGED BLOCK - kubectl aliases"
-  # Create aliases for convenience
 
 - name: Install k9s cluster management tool
   shell: |
@@ -102,7 +91,6 @@
     rm -f k9s_Linux_amd64.tar.gz LICENSE README.md
   args:
     creates: /usr/local/bin/k9s
-  # Install k9s cluster management tool
 
 - name: Install kubectx and kubens
   shell: |
@@ -111,4 +99,3 @@
     ln -s /opt/kubectx/kubens /usr/local/bin/kubens
   args:
     creates: /usr/local/bin/kubectx
-  # Install kubectx and kubens

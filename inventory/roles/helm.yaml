@@ -5,14 +5,7 @@
     name: "{{ item.name }}"
     repo_url: "{{ item.url }}"
     kubeconfig: /etc/rancher/rke2/rke2.yaml
-  loop:
-    - { name: jetstack, url: https://charts.jetstack.io }
-    - { name: metallb, url: https://metallb.github.io/metallb }
-    - { name: longhorn, url: https://charts.longhorn.io }
-    - { name: argo, url: https://argoproj.github.io/argo-helm }
-    - { name: hashicorp, url: https://helm.releases.hashicorp.com }
-    - { name: vmware-tanzu, url: https://vmware-tanzu.github.io/helm-charts }
-    - { name: istio, url: https://istio-release.storage.googleapis.com/charts }
+  loop: "{{ helm_repos }}"
 
 # Cert-Manager
 - name: Deploy Cert-Manager
