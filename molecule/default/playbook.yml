@@ -1,0 +1,104 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: Install required packages
+      apt:
+        name:
+          - git
+          - jq
+          - unzip
+          - bash-completion
+        state: present
+
+    - name: Install kubectl
+      shell: |
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+        chmod +x kubectl
+        mv kubectl /usr/local/bin/
+      args:
+        creates: /usr/local/bin/kubectl
+
+    - name: Install Helm
+      shell: |
+        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+      args:
+        creates: /usr/local/bin/helm
+
+    - name: Install Rancher CLI
+      shell: |
+        curl -LO "https://github.com/rancher/cli/releases/download/v2.6.9/rancher-linux-amd64-v2.6.9.tar.gz"
+        tar xzf rancher-linux-amd64-v2.6.9.tar.gz
+        mv rancher-v2.6.9/rancher /usr/local/bin/
+        rm -rf rancher-v2.6.9 rancher-linux-amd64-v2.6.9.tar.gz
+      args:
+        creates: /usr/local/bin/rancher
+
+    - name: Create .kube directory
+      file:
+        path: "/root/.kube"
+        state: directory
+        mode: '0700'
+
+    - name: Copy kubeconfig from first master
+      ansible.builtin.fetch:
+        src: /etc/rancher/rke2/rke2.yaml
+        dest: /tmp/rke2.yaml
+        flat: yes
+      delegate_to: "{{ groups['master'][0] }}"
+
+    - name: Deploy kubeconfig to admin node
+      copy:
+        src: /tmp/rke2.yaml
+        dest: /root/.kube/config
+        mode: '0600'
+
+    - name: Update kubeconfig server address
+      replace:
+        path: /root/.kube/config
+        regexp: 'https://127.0.0.1:6443'
+        replace: 'https://{{ kube_vip_ip }}:6443'
+
+    - name: Set up kubectl bash completion
+      lineinfile:
+        path: /root/.bashrc
+        line: 'source <(kubectl completion bash)'
+        create: yes
+
+    - name: Set up helm bash completion
+      lineinfile:
+        path: /root/.bashrc
+        line: 'source <(helm completion bash)'
+        create: yes
+
+    - name: Create aliases for convenience
+      blockinfile:
+        path: /root/.bashrc
+        block: |
+          alias k='kubectl'
+          alias kg='kubectl get'
+          alias kd='kubectl describe'
+          alias kl='kubectl logs'
+          alias kgp='kubectl get pods'
+          alias kgn='kubectl get nodes'
+          alias kgs='kubectl get services'
+          alias ctx='kubectl config use-context'
+          alias ns='kubectl config set-context --current --namespace'
+        marker: "# {mark} ANSIBLE MANAGED BLOCK - kubectl aliases"
+
+    - name: Install k9s cluster management tool
+      shell: |
+        curl -LO "https://github.com/derailed/k9s/releases/download/v0.27.3/k9s_Linux_amd64.tar.gz"
+        tar xzf k9s_Linux_amd64.tar.gz
+        mv k9s /usr/local/bin/
+        rm -f k9s_Linux_amd64.tar.gz LICENSE README.md
+      args:
+        creates: /usr/local/bin/k9s
+
+    - name: Install kubectx and kubens
+      shell: |
+        git clone https://github.com/ahmetb/kubectx /opt/kubectx
+        ln -s /opt/kubectx/kubectx /usr/local/bin/kubectx
+        ln -s /opt/kubectx/kubens /usr/local/bin/kubens
+      args:
+        creates: /usr/local/bin/kubectx

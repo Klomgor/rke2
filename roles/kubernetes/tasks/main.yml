@@ -8,6 +8,7 @@
         state: present
         definition: "{{ lookup('template', 'kubernetes-manifests.yaml.j2') | from_yaml_all | list }}"
       when: inventory_hostname in groups['servers']
+      # Apply Kubernetes manifests
 
     - name: Deploy network policies
       kubernetes.core.k8s:
@@ -15,6 +16,7 @@
         state: present
         definition: "{{ lookup('template', 'network-policies.yaml.j2') | from_yaml_all | list }}"
       when: inventory_hostname in groups['servers']
+      # Deploy network policies
 
     - name: Deploy security configurations
       kubernetes.core.k8s:
@@ -22,3 +24,4 @@
         state: present
         definition: "{{ lookup('template', 'security-configurations.yaml.j2') | from_yaml_all | list }}"
       when: inventory_hostname in groups['servers']
+      # Deploy security configurations

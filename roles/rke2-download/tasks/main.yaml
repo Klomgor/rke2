@@ -4,12 +4,16 @@
     path: "{{ rke2_install_dir }}"
     state: directory
     mode: '0755'
+  # Create directory for RKE2 binary
 
 - name: Download RKE2 binary
   ansible.builtin.get_url:
     url: "{{ rke2_binary_url }}"
     dest: "{{ rke2_install_dir }}/rke2"
     mode: '0755'
+  args:
+    creates: "{{ rke2_install_dir }}/rke2"
+  # Download RKE2 binary
 
 - name: Set executable permissions on the RKE2 binary
   ansible.builtin.file:
@@ -17,3 +21,4 @@
     mode: '0755'
     state: file
   check_mode: false
+  # Set executable permissions on the RKE2 binary

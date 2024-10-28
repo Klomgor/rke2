@@ -10,6 +10,7 @@
       - nfs-common
     state: present
     update_cache: yes
+  # Install required packages
 
 - name: Set up required kernel modules
   modprobe:
@@ -18,6 +19,7 @@
   with_items:
     - br_netfilter
     - overlay
+  # Set up required kernel modules
 
 - name: Configure sysctl parameters
   sysctl:
@@ -29,9 +31,11 @@
     - { name: 'net.bridge.bridge-nf-call-iptables', value: '1' }
     - { name: 'net.bridge.bridge-nf-call-ip6tables', value: '1' }
     - { name: 'net.ipv4.ip_forward', value: '1' }
+  # Configure sysctl parameters
 
 - name: Install RKE2
   shell: |
     curl -sfL https://get.rke2.io | INSTALL_RKE2_VERSION={{ rke2_version }} sh -
   args:
     creates: /usr/local/bin/rke2
+  # Install RKE2

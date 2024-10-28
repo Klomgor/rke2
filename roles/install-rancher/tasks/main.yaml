@@ -6,6 +6,7 @@
     mode: '0700'
     force: false
   changed_when: false
+  # Download and install Helm
 
 - name: Prepare admin node for Rancher
   ansible.builtin.shell: |
@@ -17,6 +18,7 @@
   args:
     chdir: /tmp
   changed_when: false
+  # Prepare the admin node for Rancher installation
 
 - name: Install Cert-Manager
   ansible.builtin.shell: |
@@ -27,6 +29,7 @@
   args:
     chdir: /tmp
   changed_when: false
+  # Install Cert-Manager
 
 - name: Install Rancher
   ansible.builtin.shell: |
@@ -38,6 +41,7 @@
   args:
     chdir: /tmp
   changed_when: false
+  # Install Rancher
 
 - name: Add Rancher LoadBalancer
   ansible.builtin.shell: |
@@ -46,6 +50,7 @@
   args:
     chdir: /tmp
   changed_when: false
+  # Add a LoadBalancer for Rancher
 
 - name: Wait for LoadBalancer to come online
   ansible.builtin.wait_for:
@@ -53,9 +58,11 @@
     delay: 5
     timeout: 1800
     state: present
+  # Wait for the LoadBalancer to come online
 
 - name: Get Rancher service
   ansible.builtin.command: kubectl get svc -n cattle-system
   environment:
     KUBECONFIG: /home/{{ user }}/.kube/rke2.yaml
   changed_when: false
+  # Get the Rancher service details

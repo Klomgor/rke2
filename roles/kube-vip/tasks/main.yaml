@@ -5,6 +5,7 @@
     state: directory
     mode: '0644'
   when: inventory_hostname in groups['servers']
+  # Create directory for Kube VIP Manifest
 
 - name: Deploy Kube VIP Configuration
   ansible.builtin.template:
@@ -14,3 +15,4 @@
     group: root
     mode: '0644'
   when: inventory_hostname == groups['servers'][0]
+  # Deploy Kube VIP Configuration

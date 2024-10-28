@@ -1,0 +1,79 @@
+---
+- name: Verify required packages are installed
+  hosts: all
+  tasks:
+    - name: Check if git is installed
+      command: git --version
+      register: git_version
+    - name: Check if jq is installed
+      command: jq --version
+      register: jq_version
+    - name: Check if unzip is installed
+      command: unzip -v
+      register: unzip_version
+    - name: Check if bash-completion is installed
+      command: dpkg -s bash-completion
+      register: bash_completion_status
+
+- name: Verify kubectl installation
+  hosts: all
+  tasks:
+    - name: Check if kubectl is installed
+      command: kubectl version --client
+      register: kubectl_version
+
+- name: Verify Helm installation
+  hosts: all
+  tasks:
+    - name: Check if Helm is installed
+      command: helm version
+      register: helm_version
+
+- name: Verify Rancher CLI installation
+  hosts: all
+  tasks:
+    - name: Check if Rancher CLI is installed
+      command: rancher --version
+      register: rancher_version
+
+- name: Verify kubeconfig setup
+  hosts: all
+  tasks:
+    - name: Check if kubeconfig file exists
+      stat:
+        path: /root/.kube/config
+      register: kubeconfig_file
+
+- name: Verify bash completion setup
+  hosts: all
+  tasks:
+    - name: Check if kubectl bash completion is set up
+      shell: grep 'source <(kubectl completion bash)' /root/.bashrc
+      register: kubectl_bash_completion
+    - name: Check if helm bash completion is set up
+      shell: grep 'source <(helm completion bash)' /root/.bashrc
+      register: helm_bash_completion
+
+- name: Verify kubectl aliases setup
+  hosts: all
+  tasks:
+    - name: Check if kubectl aliases are set up
+      shell: grep 'alias k=' /root/.bashrc
+      register: kubectl_aliases
+
+- name: Verify k9s installation
+  hosts: all
+  tasks:
+    - name: Check if k9s is installed
+      command: k9s version
+      register: k9s_version
+
+- name: Verify kubectx and kubens installation
+  hosts: all
+  tasks:
+    - name: Check if kubectx is installed
+      command: kubectx --version
+      register: kubectx_version
+    - name: Check if kubens is installed
+      command: kubens --version
+      register: kubens_version
