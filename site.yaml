@@ -54,6 +54,26 @@
   roles:
     - install-longhorn
 
-# - name: Install kubewarden
+- name: Install Helm
+  hosts: admin
+  gather_facts: true
+  roles:
+    - helm
 
-# - name: Install neuvector
+- name: Manage Kubernetes resources and configurations
+  hosts: all
+  gather_facts: true
+  roles:
+    - kubernetes
+
+- name: Deploy monitoring stack
+  hosts: servers
+  gather_facts: true
+  roles:
+    - monitoring
+
+- name: Deploy security configurations
+  hosts: servers
+  gather_facts: true
+  roles:
+    - security

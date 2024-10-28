@@ -18,13 +18,14 @@
   - Secrets management with Vault
 
 ### Changed
-- N/A
+- Merged `site.yaml` and `site.yml` into one `site.yaml` file, including all roles and tasks, maintaining the order, and removing duplicates.
+- Renamed all `.yml` files to `.yaml` for consistency.
 
 ### Deprecated
 - N/A
 
 ### Removed
-- N/A
+- Deprecated roles or tasks
 
 ### Fixed
 - N/A
